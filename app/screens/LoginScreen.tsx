@@ -1,4 +1,3 @@
-import api from '../services/api';
 import React, { useState } from 'react';
 import {
   View,
@@ -14,28 +13,40 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
+import {
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
+} from 'react-native-confirmation-code-field';
+
+const CELL_COUNT = 6;
 
 const schema = Yup.object().shape({
   phone: Yup.string()
     .required('El número es obligatorio')
     .matches(/^\d{10}$/, 'Debe tener exactamente 10 dígitos'),
-  otp: Yup.string()
-    .matches(/^\d{6}$/, 'Debe tener 6 dígitos')
-    .optional(),
 });
 
 export default function LoginScreen() {
   const navigation = useNavigation();
+  const { login } = useAuth();
   const [otpEnabled, setOtpEnabled] = useState(false);
-   const { login } = useAuth();
+  const [otpValue, setOtpValue] = useState('');
+  const ref = useBlurOnFulfill({ value: otpValue, cellCount: CELL_COUNT });
+  const [propsOtp, getCellOnLayoutHandler] = useClearByFocusCell({
+    value: otpValue,
+    setValue: setOtpValue,
+  });
 
   const {
     control,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -66,15 +77,13 @@ export default function LoginScreen() {
     }
   };
 
-  const handleOtpSubmit = async (data: any) => {
+  const handleOtpSubmit = async () => {
     try {
       const response = await api.post('/otp', {
-        celular: data.phone,
-        otp: data.otp,
+        celular: watch('phone'),
+        otp: otpValue,
       });
 
-     
-      
       if (response.status === 200 && response.data.data?.token) {
         const { token } = response.data.data;
         if (token) {
@@ -91,7 +100,6 @@ export default function LoginScreen() {
     }
   };
 
-
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -105,7 +113,7 @@ export default function LoginScreen() {
         />
         <Text style={styles.title}>DaviPay</Text>
 
-        {/* Teléfono */}
+        {/* TELÉFONO */}
         <Controller
           control={control}
           name="phone"
@@ -128,32 +136,38 @@ export default function LoginScreen() {
           style={styles.primaryButton}
           onPress={handleSubmit(handlePhoneSubmit)}
         >
-          <Text style={styles.primaryButtonText}>Empezar</Text>
+          <Text style={styles.primaryButtonText}>Vamos</Text>
         </TouchableOpacity>
 
-        {/* OTP dinámico */}
+        {/* OTP */}
         {otpEnabled && (
           <>
-            <Controller
-              control={control}
-              name="otp"
-              render={({ field: { onChange, value } }) => (
-                <TextInput
-                  style={styles.input}
-                  placeholder="Código OTP"
-                  keyboardType="numeric"
-                  maxLength={6}
-                  onChangeText={onChange}
-                  value={value}
-                />
+            <Text style={styles.otpLabel}>Ingresa el código OTP</Text>
+            <CodeField
+              ref={ref}
+              {...propsOtp}
+              value={otpValue}
+              onChangeText={setOtpValue}
+              cellCount={CELL_COUNT}
+              rootStyle={styles.codeFieldRoot}
+              keyboardType="number-pad"
+              textContentType="oneTimeCode"
+              renderCell={({ index, symbol, isFocused }) => (
+                <View
+                  key={index}
+                  style={[styles.cell, isFocused && styles.focusCell]}
+                  onLayout={getCellOnLayoutHandler(index)}
+                >
+                  <Text style={styles.cellText}>
+                    {symbol || (isFocused ? <Cursor /> : '')}
+                  </Text>
+                </View>
               )}
             />
-            {errors.otp && (
-              <Text style={styles.error}>{errors.otp.message}</Text>
-            )}
+
             <TouchableOpacity
-              style={[styles.primaryButton, { marginTop: 10 }]}
-              onPress={handleSubmit(handleOtpSubmit)}
+              style={[styles.primaryButton, { marginTop: 20 }]}
+              onPress={handleOtpSubmit}
             >
               <Text style={styles.primaryButtonText}>Validar OTP</Text>
             </TouchableOpacity>
@@ -174,7 +188,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
     borderRadius: 24,
-    padding: 30,
+    padding: 40,
     alignItems: 'center',
     elevation: 5,
   },
@@ -192,13 +206,14 @@ const styles = StyleSheet.create({
     width: '100%',
     borderBottomWidth: 1,
     borderBottomColor: '#aaa',
-    paddingVertical: 10,
+    paddingVertical: 12,
     fontSize: 16,
-    marginBottom: 10,
+    marginBottom: 16,
   },
   error: {
     color: 'red',
     marginBottom: 10,
+    alignSelf: 'flex-start',
   },
   primaryButton: {
     backgroundColor: '#c90013',
@@ -212,5 +227,36 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  otpLabel: {
+    marginTop: 30,
+    fontWeight: '500',
+    fontSize: 14,
+    alignSelf: 'flex-start',
+  },
+  codeFieldRoot: {
+    marginTop: 20,
+    marginBottom: 10,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  cell: {
+    width: 40,
+    height: 50,
+    lineHeight: 48,
+    fontSize: 20,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cellText: {
+    fontSize: 20,
+  },
+  focusCell: {
+    borderColor: '#c90013',
   },
 });

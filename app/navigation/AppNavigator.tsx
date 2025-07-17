@@ -6,6 +6,7 @@ import HomeScreen from '../screens/HomeScreen';
 import { useAuth } from '../context/AuthContext';
 import { ActivityIndicator, View } from 'react-native';
 import MovimientosScreen from '../screens/MovimientosScreen';
+import TransferirScreen from '../screens/TransferirScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,11 +26,12 @@ export default function AppNavigator() {
       <Stack.Navigator>
         {token ? (
           <>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Movimientos" component={MovimientosScreen} />
+            <Stack.Screen name="Home" component={HomeScreen} options={{ headerTitle: '' , headerBackground: () => <View style={{ backgroundColor: '#c90013', flex: 1 }} />}}/>
+            <Stack.Screen name="Movimientos" component={MovimientosScreen} options={{ headerTitle: '' , headerBackground: () => <View style={{ backgroundColor: '#c90013', flex: 1 }} />}}/>
+            <Stack.Screen name="Transferir" component={TransferirScreen} options={{ headerTitle: '' , headerBackground: () => <View style={{ backgroundColor: '#c90013', flex: 1 }} />}}/>
           </>
         ) : (
-          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }}/>
         )}
       </Stack.Navigator>
     </NavigationContainer>

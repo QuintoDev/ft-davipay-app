@@ -12,6 +12,8 @@ import api from '../services/api';
 import MovimientoCard from '../components/MovimientoCard';
 import { Ionicons } from '@expo/vector-icons';
 import { useLayoutEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 export default function HomeScreen({ navigation }: any) {
   const { logout } = useAuth();
@@ -21,7 +23,7 @@ export default function HomeScreen({ navigation }: any) {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity onPress={logout} style={{ marginRight: 16 }}>
-          <Ionicons name="log-out-outline" size={24} color="#000000ff" />
+          <Ionicons name="log-out-outline" size={24} color="#ffffffff" />
         </TouchableOpacity>
       ),
     });
@@ -45,9 +47,11 @@ export default function HomeScreen({ navigation }: any) {
     }
   };
 
-  useEffect(() => {
+ useFocusEffect(
+  useCallback(() => {
     cargarDatos();
-  }, []);
+  }, [])
+);
 
   return (
     <ScrollView style={styles.container}>
