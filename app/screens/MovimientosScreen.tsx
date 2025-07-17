@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   FlatList,
   ActivityIndicator,
   Alert,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import styles from './MovimientosScreenStyles';
 
 export default function MovimientosScreen() {
   const { logout } = useAuth();
@@ -89,37 +89,3 @@ function getDescripcion(mov: any) {
     ? `Transferencia de ${mov.origen}`
     : `Transferencia a ${mov.destino}`;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#f5f6f9',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  item: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 10,
-    elevation: 2,
-  },
-  fecha: {
-    fontSize: 12,
-    color: '#777',
-  },
-  desc: {
-    fontSize: 15,
-    color: '#333',
-    marginVertical: 4,
-  },
-  valor: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
