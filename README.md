@@ -45,7 +45,7 @@ Edita el archivo `app.config.js` para establecer la URL base del backend:
 export default {
     // ...
     extra: {
-        apiUrl: "http://IP_LOCAL:3000/api",
+        apiUrl: "http://IP_LOCAL:3000",
     },
 };
 ```
