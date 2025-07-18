@@ -36,7 +36,22 @@ cd ft-davipay-app
 npm install
 ```
 
-3. **Ejecutar en desarrollo:**
+3. **Ajustar la variable `baseURL` en `app.config.js`:**
+
+Edita el archivo `app.config.js` para establecer la URL base del backend:
+
+```js
+// app.config.js
+export default {
+    // ...
+    extra: {
+        apiUrl: "http://IP_LOCAL:3000/api",
+    },
+};
+```
+
+
+4. **Ejecutar en desarrollo:**
 
 ```bash
 npm start
