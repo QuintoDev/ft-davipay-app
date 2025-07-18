@@ -57,7 +57,7 @@ export default {
 npm start
 ```
 
-> Usa la app de Expo Go para probarlo en tu dispositivo.
+> Usar la app de Expo Go para probarlo en un dispositivo.
 
 ---
 
